@@ -1,9 +1,11 @@
-import collections
+
 from typing import Counter
 from django.db.models.query import QuerySet
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, response
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
 from rest_framework.decorators import api_view
 from django.db.models.aggregates import Count
@@ -19,15 +21,12 @@ from store import serializers
 class productViewSet(ModelViewSet): #readonlyModelViewSet--> just read and cant be able to update, delete or...
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend,SearchFilter,OrderingFilter]
     filterset_class = ProductFilter
-    #----------insted----------
-    # def get_queryset(self):
-    #     queryset = Product.objects.all()
-    #     collection_id = self.request.query_params.get('collection_id')
-    #     if collection_id is not None: #return none if we dont have key in dic by name collection-id
-    #         queryset = queryset.filter(collection_id= collection_id) 
-    #     return queryset
+    # pagination_class = PageNumberPagination  ---> for just pagination products
+    search_fields = ['title', 'description']
+    ordering_fields = ['unit_price','last_update']
+    
     
     def get_serializer_contex(self):
         return {'request': self.request}
