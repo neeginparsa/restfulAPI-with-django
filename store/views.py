@@ -9,8 +9,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet #use for related viewclass in singleclass
 from rest_framework import status
-from .models import Collection, OrderItem, Product
-from .serializers import ProductSerializer,collectionserializer
+from .models import Collection, OrderItem, Product, Review
+from .serializers import ProductSerializer, ReviewSerializer,collectionserializer
 from store import serializers
 
 class productViewSet(ModelViewSet): #readonlyModelViewSet--> just read and cant be able to update, delete or...
@@ -37,4 +37,11 @@ class collectionViewSet(ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class ReviewViewSet(ModelViewSet):
+    serializer_class = ReviewSerializer
 
+    def get_queryset(self):
+        return Review.objects.filter(product_id=self.kwargs['product_pk'])#filter baraye inke review ha be hame product ha ekhtesas dade nashe(har product ba id be review motasel)
+     
+    def get_serializer_context(self):
+        return {'product_id': self.kwargs['product_pk']}
